@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毛选智慧 · 答案之书</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Noto Serif SC',serif;overflow-x:hidden;min-height:100vh}
+        .hero-bg{background:linear-gradient(180deg,#8B0000 0%,#A52A2A 20%,#B22222 40%,#8B0000 60%,#4a0000 80%,#2d0000 100%);position:fixed;top:0;left:0;width:100%;height:100%;z-index:-3}
+        .golden-particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;pointer-events:none}
+        .golden-star{position:absolute;background:radial-gradient(circle,#FFD700 0%,#FFA500 50%,transparent 70%);border-radius:50%;animation:goldenTwinkle var(--duration) ease-in-out infinite;opacity:0}
+        @keyframes goldenTwinkle{0%,100%{opacity:0;transform:scale(0.3)}50%{opacity:var(--opacity);transform:scale(1)}}
+        .rays-container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;overflow:hidden}
+        .ray{position:absolute;top:50%;left:50%;width:2px;height:2000px;background:linear-gradient(to bottom,transparent,rgba(255,215,0,0.1),rgba(255,215,0,0.2),rgba(255,215,0,0.1),transparent);transform-origin:top center;animation:rayRotate var(--duration) linear infinite}
+        @keyframes rayRotate{0%{transform:rotate(var(--startDeg)) translateY(-50%)}100%{transform:rotate(calc(var(--startDeg) + 360deg)) translateY(-50%)}}
+        .book-scene{perspective:1500px;perspective-origin:center 40%}
+        .book{position:relative;width:400px;height:560px;transform-style:preserve-3d;transition:transform 0.6s ease}
+        .book:hover{transform:rotateY(-3deg) rotateX(1deg)}
+        .book.flipping{animation:bookShake 0.4s ease-in-out}
+        @keyframes bookShake{0%,100%{transform:rotateY(0deg)}20%{transform:rotateY(-6deg)}60%{transform:rotateY(4deg)}}
+        .page{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:0 14px 14px 0;box-shadow:inset 4px 0 20px rgba(0,0,0,0.4),0 25px 70px rgba(0,0,0,0.6),0 0 0 1px rgba(139,0,0,0.15);overflow:hidden}
+        .cover{background:linear-gradient(145deg,#8B0000 0%,#A52A2A 30%,#8B0000 60%,#4a0000 100%);transform-origin:left center;transition:transform 1.2s cubic-bezier(0.4,0,0.2,1);z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:10px solid #2d0000}
+        .cover::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,215,0,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(255,165,0,0.05) 0%,transparent 50%);pointer-events:none}
+        .cover.flipped{transform:rotateY(-160deg)}
+        .cover-border{position:absolute;top:24px;left:24px;right:24px;bottom:24px;border:3px solid rgba(255,215,0,0.5);border-radius:10px;pointer-events:none}
+        .cover-border::before{content:'';position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid rgba(255,215,0,0.25);border-radius:6px}
+        .corner-gold{position:absolute;width:36px;height:36px;border:3px solid rgba(255,215,0,0.6)}
+        .corner-gold.tl{top:36px;left:36px;border-right:none;border-bottom:none}
+        .corner-gold.tr{top:36px;right:36px;border-left:none;border-bottom:none}
+        .corner-gold.bl{bottom:36px;left:36px;border-right:none;border-top:none}
+        .corner-gold.br{bottom:36px;right:36px;border-left:none;border-top:none}
+        .cover-star{position:absolute;top:40px;left:50%;transform:translateX(-50%);width:70px;height:70px;color:#FFD700;opacity:0.7;filter:drop-shadow(0 0 15px rgba(255,215,0,0.3))}
+        .inner-page{background:linear-gradient(90deg,#f5f0d8 0%,#faf8e8 5%,#faf8e8 95%,#f0ebd0 100%);transform-origin:left center;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:45px;border-left:14px solid #e8e0c0}
+        .inner-page::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(transparent,transparent 30px,rgba(139,0,0,0.02) 30px,rgba(139,0,0,0.02) 31px);pointer-events:none}
+        .paper-texture{position:absolute;top:0;left:0;width:100%;height:100%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");pointer-events:none;opacity:0.6}
+        .brush-title{font-family:'Ma Shan Zheng',cursive;font-weight:400;letter-spacing:0.15em}
+        .brush-hint{font-family:'Ma Shan Zheng',cursive;font-size:1.6rem;color:#3a0000;text-align:center;padding:24px 28px;background:rgba(139,0,0,0.06);border-radius:14px;border-left:4px solid rgba(139,0,0,0.3);border-right:4px solid rgba(139,0,0,0.3);opacity:0;transform:translateY(15px) scale(0.95);transition:all 0.8s ease 0.5s;max-width:92%;line-height:1.8;letter-spacing:0.05em;position:relative;box-shadow:0 4px 20px rgba(139,0,0,0.08);margin-bottom:20px}
+        .brush-hint::before{content:'💡';position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:1.3rem;background:#faf8e8;padding:0 10px;border-radius:50%}
+        .brush-hint.show{opacity:1;transform:translateY(0) scale(1)}
+        .brush-quote{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;color:#9b0000;text-align:center;line-height:1.5;opacity:0;transform:translateY(10px);transition:all 0.6s ease 0.3s;position:relative;z-index:2;letter-spacing:0.05em;font-weight:400;margin-bottom:4px}
+        .brush-quote.show{opacity:0.5;transform:translateY(0)}
+        .brush-source{font-family:'Ma Shan Zheng',cursive;font-size:0.75rem;color:#b00000;text-align:center;opacity:0;transition:all 0.6s ease 0.4s;letter-spacing:0.03em;margin-bottom:16px}
+        .brush-source.show{opacity:0.35}
+        .answer-decoration{position:absolute;width:100px;height:100px;border:3px solid rgba(139,0,0,0.15);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);transition:transform 1s ease 0.3s}
+        .answer-decoration::before{content:'';position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:1px solid rgba(139,0,0,0.1);border-radius:50%}
+        .answer-decoration.show{transform:translate(-50%,-50%) scale(2.2)}
+        .question-input{background:rgba(255,255,255,0.1);border:2px solid rgba(255,215,0,0.3);backdrop-filter:blur(10px);transition:all 0.3s ease;color:#fff}
+        .question-input:focus{border-color:rgba(255,215,0,0.8);background:rgba(255,255,255,0.15);box-shadow:0 0 30px rgba(255,215,0,0.2)}
+        .question-input::placeholder{color:rgba(255,215,0,0.4)}
+        .seek-btn{background:linear-gradient(135deg,#DAA520 0%,#B8860B 50%,#8B6914 100%);position:relative;overflow:hidden;transition:all 0.3s ease;border:1px solid rgba(255,215,0,0.3)}
+        .seek-btn::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,0.25) 0%,transparent 60%);transform:scale(0);transition:transform 0.5s ease}
+        .seek-btn:hover::before{transform:scale(1)}
+        .seek-btn:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(218,165,32,0.4)}
+        .seek-btn:active{transform:translateY(0)}
+        .seek-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+        .wind-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;overflow:hidden}
+        .wind-line{position:absolute;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.5),rgba(255,165,0,0.3),transparent);border-radius:2px;animation:windBlow var(--speed) ease-out forwards;opacity:0}
+        @keyframes windBlow{0%{opacity:0;transform:translateX(-100px) scaleX(0.3)}20%{opacity:1}100%{opacity:0;transform:translateX(calc(100vw + 100px)) scaleX(1.5)}}
+        .wind-particle{position:absolute;width:4px;height:4px;background:rgba(255,215,0,0.8);border-radius:50%;box-shadow:0 0 10px rgba(255,215,0,0.5);animation:windParticle var(--speed) ease-out forwards}
+        @keyframes windParticle{0%{opacity:0;transform:translateX(-50px) translateY(0) scale(0)}30%{opacity:1;transform:translateX(30vw) translateY(var(--drift)) scale(1)}100%{opacity:0;transform:translateX(calc(100vw + 50px)) translateY(calc(var(--drift)*2)) scale(0.5)}}
+        .magic-particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:40}
+        .magic-particle{position:absolute;width:6px;height:6px;background:radial-gradient(circle,#FFD700 0%,#FFA500 100%);border-radius:50%;box-shadow:0 0 15px #FFD700,0 0 30px rgba(255,215,0,0.5);animation:magicFloat var(--duration) ease-out forwards}
+        @keyframes magicFloat{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+        .counter-glow{animation:counterPulse 2s ease-in-out infinite}
+        @keyframes counterPulse{0%,100%{text-shadow:0 0 10px rgba(255,215,0,0.5)}50%{text-shadow:0 0 25px rgba(255,215,0,0.8),0 0 40px rgba(218,165,32,0.4)}}
+        .glow-orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:0.12;pointer-events:none;z-index:-1;animation:orbFloat 20s ease-in-out infinite}
+        @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-30px) scale(1.1)}66%{transform:translate(-30px,50px) scale(0.9)}}
+        .floating-paper{position:absolute;width:40px;height:50px;background:linear-gradient(135deg,#faf8e8 0%,#f0ebd0 100%);border-radius:2px;box-shadow:0 2px 10px rgba(0,0,0,0.2);animation:paperFloat var(--duration) ease-out forwards;opacity:0;z-index:30}
+        @keyframes paperFloat{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(0.3)}}
+        .top-bar{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#DAA520,#FFD700,#DAA520,transparent);z-index:100}
+        .star-icon{display:inline-block;color:#FFD700;animation:starSpin 8s linear infinite}
+        @keyframes starSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @media(max-width:640px){.book{width:320px;height:460px}.brush-hint{font-size:1.25rem;padding:18px 20px}.brush-quote{font-size:0.9rem}.brush-source{font-size:0.65rem}.cover-star{width:55px;height:55px;top:35px}}
+        .loading-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite}
+        @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+        .spine-texture{position:absolute;left:0;top:0;bottom:0;width:10px;background:repeating-linear-gradient(180deg,#2d0000 0px,#3d0000 2px,#2d0000 4px);z-index:11}
+        .seal-mark{position:absolute;bottom:60px;right:50px;width:60px;height:60px;border:3px solid rgba(139,0,0,0.15);border-radius:4px;transform:rotate(-15deg);display:flex;align-items:center;justify-content:center;font-family:'Ma Shan Zheng',cursive;font-size:0.7rem;color:rgba(139,0,0,0.2);opacity:0;transition:opacity 1s ease 1.2s}
+        .seal-mark.show{opacity:1}
+        .quote-mark{font-family:'Ma Shan Zheng',cursive;font-size:4rem;color:rgba(139,0,0,0.08);line-height:1;position:absolute}
+        .quote-mark.open{top:30px;left:30px}
+        .quote-mark.close{bottom:30px;right:30px}
+        .bottom-quote-area{position:absolute;bottom:50px;left:0;right:0;text-align:center;padding:0 30px}
+    </style>
+</head>
+<body>
+    <div class="top-bar"></div>
+    <div class="hero-bg"></div>
+    <div class="golden-particles" id="goldenParticles"></div>
+    <div class="rays-container" id="raysContainer"></div>
+    <div class="glow-orb" style="width:400px;height:400px;background:#DAA520;top:10%;left:10%"></div>
+    <div class="glow-orb" style="width:300px;height:300px;background:#FFD700;top:60%;right:10%;animation-delay:-7s"></div>
+    <div class="glow-orb" style="width:250px;height:250px;background:#B8860B;bottom:20%;left:40%;animation-delay:-14s"></div>
+    <div class="wind-container" id="windContainer"></div>
+    <div class="magic-particles" id="magicParticles"></div>
+    
+    <div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8">
+        <div class="mb-6 text-center">
+            <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 backdrop-blur-md border border-yellow-500/20">
+                <svg class="w-5 h-5 text-yellow-400 star-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span class="text-yellow-200/80 text-sm tracking-wider">已获智慧指引</span>
+                <span id="answerCount" class="counter-glow text-2xl font-bold text-yellow-300 font-mono">0</span>
+                <span class="text-yellow-200/50 text-xs">次</span>
+            </div>
+        </div>
+        
+        <div class="text-center mb-2">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-200 tracking-widest brush-title">毛选智慧</h1>
+                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="text-yellow-400/50 text-sm tracking-[0.3em] uppercase">The Wisdom of Mao Zedong</p>
+        </div>
+        <p class="text-yellow-300/40 text-xs mb-8 tracking-wider text-center max-w-md brush-title">星星之火，可以燎原 · 在迷茫时翻开一页，汲取前行的力量</p>
+        
+        <div class="book-scene mb-10">
+            <div class="book" id="book">
+                <div class="page cover" id="cover">
+                    <div class="spine-texture"></div>
+                    <div class="cover-border"></div>
+                    <div class="corner-gold tl"></div><div class="corner-gold tr"></div>
+                    <div class="corner-gold bl"></div><div class="corner-gold br"></div>
+                    <svg class="cover-star" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <div class="relative z-10 text-center">
+                        <div class="w-20 h-20 mx-auto mb-6 mt-20 rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-700/20 flex items-center justify-center border border-yellow-400/30">
+                            <svg class="w-10 h-10 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-yellow-100 mb-2 brush-title">毛选智慧</h2>
+                        <div class="w-20 h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent mx-auto my-4"></div>
+                        <p class="text-yellow-300/50 text-sm tracking-widest leading-relaxed brush-title">心中默念你的困惑<br>翻开寻找力量与方向</p>
+                        <div class="mt-6 flex items-center justify-center gap-2">
+                            <div class="w-8 h-px bg-yellow-500/30"></div>
+                            <svg class="w-4 h-4 text-yellow-500/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <div class="w-8 h-px bg-yellow-500/30"></div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-14 left-1/2 -translate-x-1/2 text-yellow-500/20 text-xs tracking-[0.5em] brush-title">★ 为人民服务 ★</div>
+                </div>
+                
+                <div class="page inner-page" id="innerPage">
+                    <div class="paper-texture"></div>
+                    <div class="absolute top-8 left-8 right-8 h-px bg-gradient-to-r from-transparent via-red-900/15 to-transparent"></div>
+                    <div class="absolute bottom-8 left-8 right-8 h-px bg-gradient-to-r from-transparent via-red-900/15 to-transparent"></div>
+                    <div class="quote-mark open">"</div>
+                    <div class="quote-mark close">"</div>
+                    <div class="relative w-full h-full flex flex-col items-center justify-center">
+                        <div class="answer-decoration" id="answerDecoration"></div>
+                        <div id="answerHint" class="brush-hint"></div>
+                        <div class="bottom-quote-area">
+                            <div id="answerContent" class="brush-quote">等待你的问题...</div>
+                            <div id="answerSource" class="brush-source"></div>
+                        </div>
+                        <div id="answerNumber" class="mt-4 text-red-900/20 text-xs font-mono tracking-wider opacity-0 transition-opacity duration-500">— 第 <span id="pageNumber">0</span> 章 —</div>
+                    </div>
+                    <div class="seal-mark" id="sealMark">毛选<br>智慧</div>
+                    <div class="absolute top-4 right-4 w-8 h-8 border-t border-r border-red-900/8"></div>
+                    <div class="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-red-900/8"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full max-w-md space-y-4">
+            <div class="relative">
+                <input type="text" id="questionInput" placeholder="在此输入你的困惑或问题..." class="question-input w-full px-6 py-4 rounded-xl text-white placeholder-yellow-300/40 text-center text-lg outline-none" autocomplete="off">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+            <button id="seekBtn" class="seek-btn w-full py-4 rounded-xl text-white font-bold text-lg tracking-widest flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                <span id="btnText" class="brush-title">汲取智慧</span>
+            </button>
+        </div>
+        <p class="mt-8 text-yellow-400/25 text-xs tracking-wider text-center brush-title">按下回车键或点击按钮 · 让真理之光照亮前路</p>
+    </div>
+    
+    <script>
+        const answers=[{text:"星星之火，可以燎原",source:"《星星之火，可以燎原》1930年",hint:"再小的努力，只要坚持，终将汇聚成改变命运的磅礴力量。不要轻视当下的每一步。"},{text:"世上无难事，只要肯登攀",source:"《水调歌头·重上井冈山》1965年",hint:"困难是暂时的，攀登者的脚步从不停歇。相信自己，你比想象中更强大。"},{text:"战略上藐视敌人，战术上重视敌人",source:"《关于目前党的政策中的几个重要问题》1948年",hint:"面对挑战，保持信心与勇气；执行时，脚踏实地、一丝不苟。心态决定高度，细节决定成败。"},{text:"自己动手，丰衣足食",source:"《抗日战争时期的经济问题和财政问题》1942年",hint:"依靠自己，是最可靠的出路。主动行动，才能掌握人生的主动权。"},{text:"一切反动派都是纸老虎",source:"《和美国记者安娜·路易斯·斯特朗的谈话》1946年",hint:"你恐惧的事情，往往没有想象中那么可怕。直面它，你会发现它不堪一击。"},{text:"没有调查就没有发言权",source:"《反对本本主义》1930年",hint:"做决定前，先深入了解。信息越充分，选择越明智。别让偏见蒙蔽双眼。"},{text:"从群众中来，到群众中去",source:"《关于领导方法的若干问题》1943年",hint:"善于倾听和借力。一个人的力量有限，团队与伙伴能让你走得更远。"},{text:"打得赢就打，打不赢就走",source:"《中国革命战争的战略问题》1936年",hint:"灵活应变是智慧。该坚持时坚持，该调整时调整，保存实力才能赢得最终胜利。"},{text:"人不犯我，我不犯人；人若犯我，我必犯人",source:"《和中央社、扫荡报、新民报三记者的谈话》1939年",hint:"善良要有底线，宽容要有原则。保护自己，是对自己最大的负责。"},{text:"夺取全国胜利，这只是万里长征走完了第一步",source:"《在中国共产党第七届中央委员会第二次全体会议上的报告》1949年",hint:"每一个成就都是新起点。保持谦逊，继续前行，更大的风景在前方。"},{text:"虚心使人进步，骄傲使人落后",source:"《中国共产党第八次全国代表大会开幕词》1956年",hint:"永远保持空杯心态。学习是一生的事业，谦逊是最好的通行证。"},{text:"百花齐放，百家争鸣",source:"《关于正确处理人民内部矛盾的问题》1957年",hint:"包容不同的声音和想法。多样性带来创造力，开放的心态让你看到更多可能。"},{text:"好好学习，天天向上",source:"《对少年儿童的题词》1951年",hint:"每一天都是进步的机会。哪怕只学一点点，日积月累也会带来惊人的改变。"},{text:"前途是光明的，道路是曲折的",source:"《关于重庆谈判》1945年",hint:"低谷时不要绝望，高峰时不要骄傲。曲折是通往光明的必经之路。"},{text:"群众是真正的英雄",source:"《〈农村调查〉的序言和跋》1941年",hint:"身边的人都可能是你的贵人。保持善意，真诚待人，人脉是最好的财富。"},{text:"下定决心，不怕牺牲，排除万难，去争取胜利",source:"《愚公移山》1945年",hint:"决心比能力更重要。当你真正下定决心，全世界都会为你让路。"},{text:"枪杆子里面出政权",source:"《在中央紧急会议上的发言》1927年",hint:"实力是最好的话语权。投资自己，提升能力，才能在任何场合站稳脚跟。"},{text:"实事求是",source:"《改造我们的学习》1941年",hint:"认清现实，接纳真实的自己。不逃避、不幻想，脚踏实地才是通往成功的捷径。"},{text:"为人民服务",source:"《为人民服务》1944年",hint:"利他即利己。当你真诚帮助他人时，回报往往以意想不到的方式到来。"},{text:"在战略上要藐视敌人，在战术上要重视敌人",source:"《关于目前党的政策中的几个重要问题》1948年",hint:"对目标保持信心，对过程保持敬畏。宏大的愿景需要细致的行动来支撑。"},{text:"事物总是发展的，旧的矛盾解决了，新的矛盾又会产生",source:"《关于正确处理人民内部矛盾的问题》1957年",hint:"人生就是不断解决问题的过程。接受这一点，你就不会再为困难焦虑。"},{text:"政治路线确定之后，干部就是决定的因素",source:"《中国共产党在民族战争中的地位》1938年",hint:"方向明确后，执行力是关键。找到合适的方法和伙伴，事半功倍。"},{text:"我们不但善于破坏一个旧世界，我们还将善于建设一个新世界",source:"《在中国共产党第七届中央委员会第二次全体会议上的报告》1949年",hint:"改变需要勇气，重建需要智慧。敢于打破舒适区，才能创造更好的未来。"},{text:"情况是在不断地变化，要使自己的思想适应新的情况，就得学习",source:"《在中国共产党全国宣传工作会议上的讲话》1957年",hint:"世界在变，你也需要变。终身学习不是口号，而是生存的必需。"},{text:"要奋斗就会有牺牲",source:"《为人民服务》1944年",hint:"任何收获都需要代价。想清楚你愿意付出什么，然后义无反顾地去做。"},{text:"错误和挫折教训了我们，使我们比较地聪明起来了",source:"《论人民民主专政》1949年",hint:"失败是最好的老师。每一次跌倒，都是为了下一次站得更稳。"},{text:"丢掉幻想，准备斗争",source:"《丢掉幻想，准备斗争》1949年",hint:"停止幻想一夜暴富或坐享其成。真正的改变，始于脚踏实地的行动。"},{text:"凡是敌人反对的，我们就要拥护；凡是敌人拥护的，我们就要反对",source:"《和中央社、扫荡报、新民报三记者的谈话》1939年",hint:"保持独立思考，不盲从潮流。适合自己的路，才是最好的路。"},{text:"革命不是请客吃饭",source:"《湖南农民运动考察报告》1927年",hint:"改变从来不是轻松的。做好吃苦的准备，你的坚持终将开花结果。"},{text:"团结一切可以团结的力量",source:"《论联合政府》1945年",hint:"不要孤军奋战。找到志同道合的人，团结的力量远超个人。"},{text:"不管风吹浪打，胜似闲庭信步",source:"《水调歌头·游泳》1956年",hint:"内心强大的人，外界的风雨只是风景。修炼内心，方能处变不惊。"},{text:"一万年太久，只争朝夕",source:"《满江红·和郭沫若同志》1963年",hint:"时间不等人。想做的事，现在就去做。拖延是最大的敌人。"},{text:"不到长城非好汉",source:"《清平乐·六盘山》1935年",hint:"坚持到最后的人，才是真正的赢家。再坚持一下，胜利就在前方。"},{text:"雄关漫道真如铁，而今迈步从头越",source:"《忆秦娥·娄山关》1935年",hint:"过去的失败不代表未来。每一天都是新的开始，重新出发永远不晚。"},{text:"为有牺牲多壮志，敢教日月换新天",source:"《七律·到韶山》1959年",hint:"伟大的成就需要伟大的付出。你的梦想值得全力以赴。"},{text:"天若有情天亦老，人间正道是沧桑",source:"《七律·人民解放军占领南京》1949年",hint:"变化是永恒的。拥抱变化，顺势而为，才能在时代浪潮中立于不败之地。"},{text:"牢骚太盛防肠断，风物长宜放眼量",source:"《七律·和柳亚子先生》1949年",hint:"少抱怨，多行动。把眼光放长远，眼前的困难不过是人生长河中的一朵浪花。"},{text:"自信人生二百年，会当水击三千里",source:"《七古·残句》",hint:"相信自己，你拥有无限潜能。自信是最好的装备，带着它去征服世界。"},{text:"恰同学少年，风华正茂；书生意气，挥斥方遒",source:"《沁园春·长沙》1925年",hint:"青春不是年龄，而是一种心态。保持热情与锐气，永远年轻，永远热泪盈眶。"},{text:"江山如此多娇，引无数英雄竞折腰",source:"《沁园春·雪》1936年",hint:"世界很精彩，值得你去探索。走出去，你会发现更多可能。"}];
+        
+        const book=document.getElementById('book'),cover=document.getElementById('cover'),innerPage=document.getElementById('innerPage');
+        const questionInput=document.getElementById('questionInput'),seekBtn=document.getElementById('seekBtn'),btnText=document.getElementById('btnText');
+        const answerContent=document.getElementById('answerContent'),answerSource=document.getElementById('answerSource');
+        const answerHint=document.getElementById('answerHint'),answerDecoration=document.getElementById('answerDecoration');
+        const answerNumber=document.getElementById('answerNumber'),pageNumber=document.getElementById('pageNumber');
+        const answerCount=document.getElementById('answerCount'),sealMark=document.getElementById('sealMark');
+        const windContainer=document.getElementById('windContainer'),magicParticles=document.getElementById('magicParticles');
+        const goldenParticles=document.getElementById('goldenParticles'),raysContainer=document.getElementById('raysContainer');
+        
+        let count=0,isFlipping=false,isOpen=false;
+        
+        function initGoldenParticles(){for(let i=0;i<80;i++){const star=document.createElement('div');star.className='golden-star';star.style.left=Math.random()*100+'%';star.style.top=Math.random()*100+'%';const size=Math.random()*4+1;star.style.width=size+'px';star.style.height=size+'px';star.style.setProperty('--duration',Math.random()*4+2+'s');star.style.setProperty('--opacity',Math.random()*0.7+0.3);star.style.animationDelay=Math.random()*5+'s';goldenParticles.appendChild(star)}}
+        function initRays(){for(let i=0;i<12;i++){const ray=document.createElement('div');ray.className='ray';ray.style.setProperty('--startDeg',(i*30)+'deg');ray.style.setProperty('--duration',(20+i*2)+'s');raysContainer.appendChild(ray)}}
+        function createWind(){for(let i=0;i<15;i++){setTimeout(()=>{const line=document.createElement('div');line.className='wind-line';line.style.top=Math.random()*100+'%';line.style.width=Math.random()*200+100+'px';line.style.setProperty('--speed',Math.random()*0.5+0.5+'s');windContainer.appendChild(line);setTimeout(()=>line.remove(),1000)},i*50)}for(let i=0;i<20;i++){setTimeout(()=>{const particle=document.createElement('div');particle.className='wind-particle';particle.style.top=Math.random()*100+'%';particle.style.setProperty('--speed',Math.random()*1+0.8+'s');particle.style.setProperty('--drift',(Math.random()-0.5)*100+'px');windContainer.appendChild(particle);setTimeout(()=>particle.remove(),2000)},i*30)}}
+        function createMagicParticles(x,y){for(let i=0;i<30;i++){const particle=document.createElement('div');particle.className='magic-particle';particle.style.left=x+'px';particle.style.top=y+'px';particle.style.setProperty('--tx',(Math.random()-0.5)*300+'px');particle.style.setProperty('--ty',(Math.random()-0.5)*300+'px');particle.style.setProperty('--duration',Math.random()*1+0.5+'s');particle.style.width=Math.random()*8+4+'px';particle.style.height=particle.style.width;magicParticles.appendChild(particle);setTimeout(()=>particle.remove(),1500)}}
+        function createFloatingPapers(){const rect=book.getBoundingClientRect();for(let i=0;i<5;i++){setTimeout(()=>{const paper=document.createElement('div');paper.className='floating-paper';paper.style.left=rect.left+rect.width/2+'px';paper.style.top=rect.top+rect.height/2+'px';paper.style.setProperty('--tx',(Math.random()-0.5)*400+'px');paper.style.setProperty('--ty',-Math.random()*300-100+'px');paper.style.setProperty('--rot',Math.random()*720+'deg');paper.style.setProperty('--duration',Math.random()*1.5+1+'s');document.body.appendChild(paper);setTimeout(()=>paper.remove(),2500)},i*100)}}
+        
+        function seekAnswer(){if(isFlipping)return;const question=questionInput.value.trim();if(!question){questionInput.focus();questionInput.style.animation='shake 0.5s ease';setTimeout(()=>questionInput.style.animation='',500);return}isFlipping=true;seekBtn.disabled=true;btnText.textContent='翻阅中';btnText.classList.add('loading-dots');const btnRect=seekBtn.getBoundingClientRect();createMagicParticles(btnRect.left+btnRect.width/2,btnRect.top+btnRect.height/2);createWind();book.classList.add('flipping');setTimeout(()=>{cover.classList.add('flipped');isOpen=true;createFloatingPapers();setTimeout(()=>{const answer=answers[Math.floor(Math.random()*answers.length)];answerHint.textContent=answer.hint;answerContent.textContent='\"'+answer.text+'\"';answerSource.textContent='—— '+answer.source;pageNumber.textContent=Math.floor(Math.random()*40)+1;answerHint.classList.add('show');answerContent.classList.add('show');answerSource.classList.add('show');answerDecoration.classList.add('show');sealMark.classList.add('show');answerNumber.style.opacity='1';count++;answerCount.textContent=count;setTimeout(()=>{isFlipping=false;seekBtn.disabled=false;btnText.textContent='再次汲取';btnText.classList.remove('loading-dots');book.classList.remove('flipping')},500)},600)},400)}
+        
+        function resetBook(){if(!isOpen||isFlipping)return;isFlipping=true;answerHint.classList.remove('show');answerContent.classList.remove('show');answerSource.classList.remove('show');answerDecoration.classList.remove('show');sealMark.classList.remove('show');answerNumber.style.opacity='0';setTimeout(()=>{cover.classList.remove('flipped');isOpen=false;setTimeout(()=>{isFlipping=false;questionInput.value='';questionInput.focus();btnText.textContent='汲取智慧'},600)},300)}
+        
+        seekBtn.addEventListener('click',()=>{if(isOpen){resetBook();setTimeout(seekAnswer,800)}else seekAnswer()});
+        questionInput.addEventListener('keypress',(e)=>{if(e.key==='Enter'){if(isOpen){resetBook();setTimeout(seekAnswer,800)}else seekAnswer()}});
+        innerPage.addEventListener('click',()=>{if(isOpen&&!isFlipping)resetBook()});
+        
+        const style=document.createElement('style');style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}';document.head.appendChild(style);
+        initGoldenParticles();initRays();questionInput.focus();
+    </script>
+</body>
+</html>
